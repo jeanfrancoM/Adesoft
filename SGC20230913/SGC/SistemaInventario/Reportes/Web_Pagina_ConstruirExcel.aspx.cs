@@ -4198,5 +4198,6 @@ namespace SistemaInventario.Reportes
             Response.TransmitFile(Server.MapPath(Request["NombreArchivo"].ToString()));
             Response.End();
         }
+        public string reporte_nenas() { string hola = "hola"; return hola; }
     }
 }
