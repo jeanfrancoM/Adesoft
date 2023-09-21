@@ -3074,16 +3074,7 @@ namespace SistemaInventario.Reportes
 
             ExcelPackage pck = new ExcelPackage(newFile);
 
-            var nombreHoja = Request["NombreHoja"].ToString();
-            var ws = pck.Workbook.Worksheets.FirstOrDefault(sheet => sheet.Name == nombreHoja);
-            if (ws != null)
-            {
-                pck.Workbook.Worksheets.Delete(ws);
-            }
-
-            ws = pck.Workbook.Worksheets.Add(nombreHoja);
-
-        
+            var ws = pck.Workbook.Worksheets[Request["NombreHoja"].ToString()];
 
             for (int i = 2; i < 50000; i++)
                 ws.DeleteRow(2);
@@ -3110,16 +3101,6 @@ namespace SistemaInventario.Reportes
             DataTable dtTabla = null;
 
             dtTabla = objDocumentoVentaCabCN.F_Cobranzas_Reporte_COBRADOS_HASTA(objDocumentoVentaCabCE);
-
-            for (int col = 1; col <= dtTabla.Columns.Count; col++)
-            {
-                ws.Cells[1, col].Value = dtTabla.Columns[col - 1].ColumnName;
-            }
-            using (var range = ws.Cells[1, 1, 1, dtTabla.Columns.Count])
-            {
-                range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                range.Style.Font.Bold = true;
-            }
 
             Int32 j = 1;
 
@@ -3168,34 +3149,13 @@ namespace SistemaInventario.Reportes
                 // Almacena la moneda actual
                 monedaTotal = dtTabla.Rows[c]["Moneda"].ToString();
 
-               
-
                 // Si este es el último registro de la empresa, agrega la fórmula de suma
                 if (c == dtTabla.Rows.Count - 1 || ruc != dtTabla.Rows[c + 1]["Ruc"].ToString())
                 {
-                    
-                        ws.Cells["G" + (c + j + 1).ToString()].Value = "TOTAL:";
+                    ws.Cells["G" + (c + j + 1).ToString()].Value = "TOTAL:";
 
-                        ws.Cells["H" + (c + j + 1).ToString()].Formula = "SUM(H" + (Partida).ToString() + ":H" + (c + j).ToString() + ")";
-                        ws.Cells["I" + (c + j + 1).ToString()].Value = monedaTotal; // Agrega la moneda
-
-                        string startCell = "A" + Partida;
-                        string endCell = "A" + (c + j);
-                        var rucCellRange = ws.Cells[startCell + ":" + endCell];
-                        rucCellRange.Merge = true;
-
-                        // Centra horizontal y verticalmente
-                        rucCellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                        rucCellRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
-
-                        string partidacelda = "B" + Partida;
-                        string fincelda = "B" + (c + j);
-                        var unido = ws.Cells[partidacelda + ":" + fincelda];
-
-                        unido.Merge = true;
-                        unido.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                        unido.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    ws.Cells["H" + (c + j + 1).ToString()].Formula = "SUM(H" + (Partida).ToString() + ":H" + (c + j).ToString() + ")";
+                    ws.Cells["I" + (c + j + 1).ToString()].Value = monedaTotal; // Agrega la moneda
 
                     j += 1; // Incrementa j para mantener un seguimiento de las filas adicionales
                     totalMontoEmpresa = 0; // Restablece la suma para la siguiente empresa
@@ -4198,6 +4158,6 @@ namespace SistemaInventario.Reportes
             Response.TransmitFile(Server.MapPath(Request["NombreArchivo"].ToString()));
             Response.End();
         }
-        public string reporte_nenas() { string hola = "hola"; return hola; }
+       
     }
 }
